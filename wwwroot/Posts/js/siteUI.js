@@ -524,7 +524,7 @@ function newUser() {
     User.Password = "";
     User.Email = "";
     User.Avatar = "no-avatar.png";
-    User.Authorizations = 0
+    User.Authorizations = 0;
     return User;
 }
 function renderPostForm(post = null) {
