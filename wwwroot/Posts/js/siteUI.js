@@ -24,6 +24,9 @@ async function Init_UI() {
     $('#createPost').on("click", async function () {
         showCreatePostForm();
     });
+    $('#createUser').on("click", async function () {
+        showCreateUserForm();
+    });
     $('#abort').on("click", async function () {
         showPosts();
     });
@@ -143,6 +146,11 @@ function showCreatePostForm() {
     showForm();
     $("#viewTitle").text("Ajout de nouvelle");
     renderPostForm();
+}
+function showCreateUserForm() {
+    showForm();
+    $("#viewTitle").text("Ajout d'utilisateur");
+    renderUserForm();
 }
 function showEditPostForm(id) {
     showForm();
@@ -458,6 +466,15 @@ function newPost() {
     Post.Category = "";
     return Post;
 }
+function newUser() {
+    let User = {};
+    User.Id = 0;
+    User.Name = "";
+    User.Password = "";
+    User.Email = "";
+    User.Avatar = "no-avatar.png";
+    return User;
+}
 function renderPostForm(post = null) {
     let create = post == null;
     if (create) post = newPost();
@@ -536,6 +553,91 @@ function renderPostForm(post = null) {
         }
         else
             showError("Une erreur est survenue! ", Posts_API.currentHttpError);
+    });
+    $('#cancel').on("click", async function () {
+        await showPosts();
+    });
+}
+function renderUserForm(user = null) {
+    let create = user == null;
+    if (create) user = newUser();
+    $("#form").show();
+    $("#form").empty();
+    $("#form").append(`
+        <form class="form" id="userForm">
+            <input type="hidden" name="Id" value="${user.Id}"/>
+             <input type="hidden" name="Date" value="${user.Created}"/>
+            <label for="Name" class="form-label">Nom </label>
+            <input 
+                class="form-control"
+                name="Name" 
+                id="Name" 
+                placeholder="Nom"
+                required
+                RequireMessage="Veuillez entrer un nom"
+                InvalidMessage="Le nom comporte un caractère illégal"
+                value="${user.Name}"
+            />
+            <label for="Email" class="form-label">Email </label>
+            <input 
+                class="form-control"
+                name="Email" 
+                id="Email" 
+                placeholder="Email"
+                required
+                RequireMessage="Veuillez entrer un Email"
+                InvalidMessage="L'Email comporte un caractère illégal"
+                value="${user.Email}"
+            />
+            <label for="Password" class="form-label">Mot de passe </label>
+            <input 
+                class="form-control"
+                name="Password" 
+                id="Password" 
+                placeholder="Mot de passe"
+                required
+                RequireMessage="Veuillez entrer un mot de passe"
+                InvalidMessage="Le mot de passe comporte un caractère illégal"
+                value="${user.Password}"
+            />
+            <label class="form-label">Avatar </label>
+            <div class='imageUploaderContainer'>
+                <div class='imageUploader' 
+                     newImage='${create}' 
+                     controlId='Image' 
+                     imageSrc='${user.Avatar}' 
+                     waitingImage="Loading_icon.gif">
+                </div>
+            </div>
+            <div id="keepDateControl">
+                <input type="checkbox" name="keepDate" id="keepDate" class="checkbox" checked>
+                <label for="keepDate"> Conserver la date de création </label>
+            </div>
+            <input type="submit" value="Enregistrer" id="saveUser" class="btn btn-primary displayNone">
+        </form>
+    `);
+    if (create) $("#keepDateControl").hide();
+
+    initImageUploaders();
+    initFormValidation(); // important do to after all html injection!
+
+    $("#commit").click(function () {
+        $("#commit").off();
+        return $('#saveUser').trigger("click");
+    });
+    $('#userForm').on("submit", async function (event) {
+        event.preventDefault();
+        let user = getFormData($("#userForm"));
+        if (create || !('keepDate' in user))
+            user.Created = Local_to_UTC(Date.now());
+        delete user.keepDate;
+        user = await Users_API.Save(user, create);
+        if (!Users_API.error) {
+            await showUsers();
+            usersPanel.scrollToElem(user.Id);
+        }
+        else
+            showError("Une erreur est survenue! ", Users_API.currentHttpError);
     });
     $('#cancel').on("click", async function () {
         await showPosts();
