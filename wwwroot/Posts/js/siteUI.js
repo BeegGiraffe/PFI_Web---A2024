@@ -419,6 +419,21 @@ async function renderEditPostForm(id) {
     }
     removeWaitingGif();
 }
+async function renderEditUserForm(id) {
+    $('#commit').show();
+    addWaitingGif();
+    let response = await Users_API.Get(id)
+    if (!Users_API.error) {
+        let User = response.data;
+        if (User !== null)
+            renderPostForm(User);
+        else
+            showError("User introuvable!");
+    } else {
+        showError(Users_API.currentHttpError);
+    }
+    removeWaitingGif();
+}
 async function renderDeletePostForm(id) {
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {
@@ -457,6 +472,42 @@ async function renderDeletePostForm(id) {
     } else
         showError(Posts_API.currentHttpError);
 }
+async function renderDeleteUserForm(id) {
+    let response = await Users_API.Get(id)
+    if (!Users_API.error) {
+        let user = response.data;
+        if (user !== null) {
+            let date = convertToFrenchDate(UTC_To_Local(user.Created));
+            $("#form").append(`
+                <div class="post" id="${user.Id}">
+                <div class="postHeader">  ${user.Name} </div>
+                <div class="postTitle ellipsis"> ${user.Email} </div>
+                <div class="postTitle ellipsis"> ${user.Authorizations} </div>
+                <img class="postImage" src='${user.Avatar}'/>
+                <div class="postDate"> ${date} </div>
+            `);
+            linefeeds_to_Html_br(".postText");
+            // attach form buttons click event callback
+            $('#commit').on("click", async function () {
+                await Users_API.Delete(user.Id);
+                if (!Users_API.error) {
+                    await showPosts();
+                }
+                else {
+                    console.log(Users_API.currentHttpError)
+                    showError("Une erreur est survenue!");
+                }
+            });
+            $('#cancel').on("click", async function () {
+                await showPosts();
+            });
+
+        } else {
+            showError("User introuvable!");
+        }
+    } else
+        showError(Users_API.currentHttpError);
+}
 function newPost() {
     let Post = {};
     Post.Id = 0;
@@ -473,6 +524,7 @@ function newUser() {
     User.Password = "";
     User.Email = "";
     User.Avatar = "no-avatar.png";
+    User.Authorizations = 0
     return User;
 }
 function renderPostForm(post = null) {
