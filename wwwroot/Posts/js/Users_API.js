@@ -1,7 +1,7 @@
 
 class Users_API {
     static Host_URL() { return "http://localhost:5000"; }
-    static API_URL() { return this.Host_URL() + "/api/accounts" };
+    static API_URL() { return this.Host_URL() + "/accounts/register" };
 
     static initHttpState() {
         this.currentHttpError = "";

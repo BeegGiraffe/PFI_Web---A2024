@@ -656,7 +656,7 @@ function renderUserForm(user = null) {
             <div class='imageUploaderContainer'>
                 <div class='imageUploader' 
                      newImage='${create}' 
-                     controlId='Image' 
+                     controlId='Avatar' 
                      imageSrc='${user.Avatar}' 
                      waitingImage="Loading_icon.gif">
                 </div>
@@ -685,7 +685,7 @@ function renderUserForm(user = null) {
         delete user.keepDate;
         user = await Users_API.Save(user, create);
         if (!Users_API.error) {
-            await showUsers();
+            await showPosts();
             usersPanel.scrollToElem(user.Id);
         }
         else
