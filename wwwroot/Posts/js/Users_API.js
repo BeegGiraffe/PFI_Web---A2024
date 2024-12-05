@@ -70,7 +70,7 @@ class Users_API {
             $.ajax({
                 url: this.API_URL() + "/" + id,
                 type: "DELETE",
-                complete: () => {
+                success: () => {
                     Users_API.initHttpState();
                     resolve(true);
                 },
