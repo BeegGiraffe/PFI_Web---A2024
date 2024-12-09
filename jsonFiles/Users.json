@@ -107,5 +107,19 @@
             "readAccess": 1,
             "writeAccess": 1
         }
+    },
+    {
+        "Id": "3271e730-b64c-11ef-9c94-61a9e6a4ca02",
+        "Date": "undefined",
+        "Name": "Warner Bros.",
+        "Email": "pierre@yopmail.com",
+        "Password": "1932",
+        "Avatar": "3271e731-b64c-11ef-9c94-61a9e6a4ca02.png",
+        "Created": 1733780385,
+        "VerifyCode": 968626,
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
     }
 ]
