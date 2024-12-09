@@ -1,7 +1,7 @@
-
 class Users_API {
     static Host_URL() { return "http://localhost:5000"; }
     static API_URL() { return this.Host_URL() + "/accounts" };
+    static Login_API_URL() { return this.Host_URL() + "/token" };
 
     static initHttpState() {
         this.currentHttpError = "";
@@ -52,12 +52,24 @@ class Users_API {
             });
         });
     }
+    static async Login(data) {
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Login_API_URL(),
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { Users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
     static async Save(data, create = true) {
         Users_API.initHttpState();
         if (create) {
             return new Promise(resolve => {
                 $.ajax({
-                    url: create ? this.API_URL() : this.API_URL() + "/register/" + data.Id,
+                    url: this.API_URL() + "/register/" + data.Id,
                     type: "POST",
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -68,7 +80,7 @@ class Users_API {
         } else {
             return new Promise(resolve => {
                 $.ajax({
-                    url: create ? this.API_URL() : this.API_URL() + "/modify/" + data.Id,
+                    url: this.API_URL() + "/modify/" + data.Id,
                     type: "PUT",
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -82,7 +94,7 @@ class Users_API {
     static async Delete(id) {
         return new Promise(resolve => {
             $.ajax({
-                url: this.API_URL() + "/" + id,
+                url: this.API_URL() + "/remove/" + id,
                 type: "DELETE",
                 success: () => {
                     Users_API.initHttpState();

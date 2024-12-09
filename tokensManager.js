@@ -68,6 +68,9 @@ export default
         }
         return null;
     }
+    static login() {
+
+    }
     static logout(userId) {
         //tokensRepository.keepByFilter(token => token.User.Id != userId);
         cachedTokens = cachedTokens.filter(token => token.User.Id != userId);

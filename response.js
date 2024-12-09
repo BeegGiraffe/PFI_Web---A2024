@@ -77,7 +77,7 @@ export default class Response {
     } // accepted status
     deleted() { return this.status(202); }  // accepted status
     created(obj) {                      // created status
-        this.res.writeHead(201, { 'content-type': 'application/json' });
+        this.res.writeHead(201, { 'content-type': 'application/json', 'Authorization' : obj.Access_token });
         return this.end(JSON.stringify(obj));
     }
     content(contentType, content) {         // let the browers cache locally the receiverd content

@@ -748,12 +748,11 @@ function renderLoginForm(user = null) {
     $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
         let user = getFormData($("#loginForm"));
-        if (true)
-        {
-            //à faire
+        user = await Users_API.Login(user);
+        if (!Users_API.error) {
+            await showPosts();
+            //usersPanel.scrollToElem(user.Id);
         }
-        else
-            showError("Une erreur est survenue! ");
     });
     $('#cancel').on("click", async function () {
         await showPosts();
