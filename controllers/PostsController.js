@@ -9,7 +9,7 @@ export default class PostModelsController extends Controller {
     }
 
     get(id) {
-        if (AccessControl.readGranted(this.HttpContext.authorizations, AccessControl.user())) {
+        if (AccessControl.readGranted(this.HttpContext.authorizations, this.HttpContext.user)) {
             if (this.repository != null) {
                 if (id !== '') {
                     let data = this.repository.get(id);
