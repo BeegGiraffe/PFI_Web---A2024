@@ -155,6 +155,11 @@ function showCreateUserForm() {
     $("#viewTitle").text("Ajout d'utilisateur");
     renderUserForm();
 }
+function showEditUserForm() {
+    showForm();
+    $("#viewTitle").text("Ajout d'utilisateur");
+    renderEditUserForm();
+}
 function showLoginForm() {
     showForm();
     $("#viewTitle").text("Connexion");
@@ -287,7 +292,20 @@ function updateDropDownMenu() {
     let DDMenu = $("#DDMenu");
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
+    if(true) //ajouter condition admin
+    {
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="adminUser">
+                <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
+            </div>`));
+    }
     DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="editUser">
+            <i class="cmdIcon fa fa-user-pen" title="Éditer Profile"></i>‎ Éditer Profile
+        </div>
+        <div class="dropdown-item menuItemLayout" id="deleteUser">
+            <i class="cmdIcon fa fa-user-xmark" title="Supprimer utilisateur"></i>‎ Supprimer utilisateur
+        </div>
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
         </div>
@@ -314,6 +332,15 @@ function updateDropDownMenu() {
         selectedCategory = "";
         await showPosts(true);
         updateDropDownMenu();
+    });
+    $('#editUser').on("click", async function () {
+        showEditUserForm();
+    });
+    $('#deleteUser').on("click", async function () {
+        showDeleteUserForm();
+    });
+    $('#adminUser').on("click", async function () {
+        showAdminUserForm();
     });
     $('.category').on("click", async function () {
         selectedCategory = $(this).text().trim();
