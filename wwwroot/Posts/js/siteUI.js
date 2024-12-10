@@ -250,6 +250,7 @@ function renderPost(post, loggedUser) {
 
     return $(`
         <div class="post" id="${post.Id}">
+            <div>${global.sessionStorage.getItem("token").user.Name}</div>
             <div class="postHeader">
                 ${post.Category}
                 ${crudIcon}
