@@ -33,7 +33,8 @@ export default class AccountsController extends Controller {
                     if (user.Password == loginInfo.Password) {
                         user = this.repository.get(user.Id);
                         let newToken = TokenManager.create(user);
-                        let created = this.HttpContext.response.created(newToken);
+                        this.HttpContext.response.created(newToken);
+                        global.sessionStorage.setItem("token", newToken);
                     } else {
                         this.HttpContext.response.wrongPassword("Wrong password.");
                     }
