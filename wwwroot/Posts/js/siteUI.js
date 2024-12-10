@@ -298,14 +298,20 @@ function updateDropDownMenu() {
             <div class="dropdown-item menuItemLayout" id="adminUser">
                 <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
             </div>`));
+        DDMenu.append($(`<div class="dropdown-divider"></div> `));
+    }
+    if(true) //ajouter condition user connected
+    {
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="editUser">
+                <i class="cmdIcon fa fa-user-pen" title="Éditer Profile"></i>‎ Éditer Profile
+            </div>
+            <div class="dropdown-item menuItemLayout" id="deleteUser">
+                <i class="cmdIcon fa fa-user-xmark" title="Supprimer utilisateur"></i>‎ Supprimer utilisateur
+            </div>`));
+        DDMenu.append($(`<div class="dropdown-divider"></div> `));
     }
     DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout" id="editUser">
-            <i class="cmdIcon fa fa-user-pen" title="Éditer Profile"></i>‎ Éditer Profile
-        </div>
-        <div class="dropdown-item menuItemLayout" id="deleteUser">
-            <i class="cmdIcon fa fa-user-xmark" title="Supprimer utilisateur"></i>‎ Supprimer utilisateur
-        </div>
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
         </div>
