@@ -107,19 +107,5 @@
             "readAccess": 1,
             "writeAccess": 1
         }
-    },
-    {
-        "Id": "7c7cbaf0-b73a-11ef-8100-55825c8ce37c",
-        "Date": "undefined",
-        "Name": "BJ Music",
-        "Email": "pierre@yopmail.com",
-        "Password": "1932",
-        "Avatar": "7c7cbaf1-b73a-11ef-8100-55825c8ce37c.png",
-        "Created": 1733882730,
-        "VerifyCode": 982420,
-        "Authorizations": {
-            "readAccess": 1,
-            "writeAccess": 1
-        }
     }
 ]
