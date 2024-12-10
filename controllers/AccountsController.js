@@ -34,7 +34,6 @@ export default class AccountsController extends Controller {
                         user = this.repository.get(user.Id);
                         let newToken = TokenManager.create(user);
                         this.HttpContext.response.created(newToken);
-                        global.sessionStorage.setItem("token", newToken);
                     } else {
                         this.HttpContext.response.wrongPassword("Wrong password.");
                     }
