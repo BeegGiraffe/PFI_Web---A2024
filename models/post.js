@@ -22,8 +22,8 @@ export default class Post extends Model {
         let usersRepository = new Repository(new UserModel());
         let ownerUser = usersRepository.get(instance.OwnerId);
         if (ownerUser) {
-            instance.ownerName = ownerUser.Name;
-            instance.ownerAvatar = ownerUser.Avatar;
+            instance.OwnerName = ownerUser.Name;
+            instance.OwnerAvatar = ownerUser.Avatar;
         }
         else {
             instance.ownerName = 'unknown';
