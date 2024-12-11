@@ -2,6 +2,9 @@
 class Posts_API {
     static Host_URL() { return "http://localhost:5000"; }
     static POSTS_API_URL() { return this.Host_URL() + "/api/posts" };
+    static POSTS_API_URL() { return this.Host_URL() + "/api/posts" };
+    static POSTLike_API_URL() { return this.POSTS_API_URL() + "/api/postLikes" };
+
 
     static initHttpState() {
         this.currentHttpError = "";
@@ -65,6 +68,7 @@ class Posts_API {
             });
         });
     }
+
     static async Delete(id) {
         return new Promise(resolve => {
             $.ajax({
@@ -77,6 +81,18 @@ class Posts_API {
                 error: (xhr) => {
                     Posts_API.setHttpErrorState(xhr); resolve(null);
                 }
+            });
+        });
+    }
+    static async addLike(data) {
+        return new Promise(resolve => {
+            $.ajax({
+                url: create ? this.POSTLike_API_URL() : this.POSTLike_API_URL() + "/" + data.Id,
+                type: create ? "POST" : "PUT",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
             });
         });
     }

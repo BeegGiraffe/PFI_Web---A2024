@@ -269,9 +269,8 @@ function renderPost(post, loggedUser) {
         }
         else if (user.isAdmin) {
             crudIcon =  `
-            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
             <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
-            <span class="lCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
+            <span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
             `;
         }
     }
@@ -406,6 +405,14 @@ function attach_Posts_UI_Events_Callback() {
     $(".deleteCmd").off();
     $(".deleteCmd").on("click", function () {
         showDeletePostForm($(this).attr("postId"));
+    });
+    $(".likeCmd").off();
+    $(".likeCmd").on("click", function () {
+        let like = {};
+        like.Id = "";
+        like.PostId = $(this).attr("postId");
+        like.UserId = Users_API.getLoginUser().id;
+        Posts_API.addLike(like)
     });
     $(".moreText").off();
     $(".moreText").click(function () {
