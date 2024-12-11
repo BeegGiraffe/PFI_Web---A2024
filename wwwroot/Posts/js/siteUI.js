@@ -715,16 +715,6 @@ function renderUserForm(user = null) {
                 InvalidMessage="L'Email comporte un caractère illégal"
                 value="${user.Email}"
             />
-            </br>
-            <input 
-                class="form-control"
-                name="Email" 
-                id="EmailCheck" 
-                placeholder="Confirmation Email"
-                required
-                RequireMessage="Veuillez ré-entrer votre Email"
-                InvalidMessage="L'Email comporte un caractère illégal"
-            />
             <label for="Password" class="form-label">Mot de passe </label>
             <input 
                 class="form-control"
