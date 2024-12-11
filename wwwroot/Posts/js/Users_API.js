@@ -74,6 +74,10 @@ class Users_API {
             });
         });
     }
+    static async logout() {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+    }
     static async Save(data, create = true) {
         Users_API.initHttpState();
         if (create) {

@@ -315,6 +315,11 @@ function updateDropDownMenu() {
                 ${user.Name}
             </div>`));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="deconnectUser">
+                <i class="cmdIcon fa fa-left-bracket" title="Déconnexion"></i>‎ Déconnexion
+            </div>`));
+        DDMenu.append($(`<div class="dropdown-divider"></div> `));
 
         if(user.isAdmin) {
             DDMenu.append($(`
@@ -361,6 +366,10 @@ function updateDropDownMenu() {
     });
     $('#connectUser').on("click", async function () {
         showLoginForm();
+    });
+    $('#deconnectUser').on("click", async function () {
+        await Users_API.logout();
+        await showPosts();
     });
     $('#editUser').on("click", async function () {
         showEditUserForm();
