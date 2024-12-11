@@ -684,7 +684,7 @@ function renderUserForm(user = null) {
     $("#form").append(`
         <form class="form" id="userForm">
             <input type="hidden" name="Id" value="${user.Id}"/>
-             <input type="hidden" name="Date" value="${user.Created}"/>
+             <input type="hidden" name="Created" value="${user.Created}"/>
             <label for="Name" class="form-label">Nom </label>
             <input 
                 class="form-control"
