@@ -93,7 +93,16 @@ function toogleShowKeywords() {
 /////////////////////////// Views management ////////////////////////////////////////////////////////////
 
 function intialView() {
-    $("#createPost").show();
+    let user = Users_API.getLoginUser();
+    if (user) {
+        if (user.isSuper)   
+            $("#createPost").show();
+        else    
+            $("#createPost").hide();
+    }
+    else    
+        $("#createPost").hide();
+
     $("#hiddenIcon").hide();
     $("#hiddenIcon2").hide();
     $('#menu').show();
@@ -255,7 +264,7 @@ function renderPost(post, loggedUser) {
             crudIcon =  `
             <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
             <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
-            <span class="likeCmd cmdIconSmall" postId="${post.Id}" title="Liker"></span>
+            <span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
             `;
         }
         else if (user.isAdmin) {
@@ -797,10 +806,17 @@ function renderLoginForm(user = null) {
     $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
         let user = getFormData($("#loginForm"));
-        user = await Users_API.Login(user);
+        await Users_API.Login(user);
+        user = Users_API.getLoginUser();
         if (!Users_API.error) {
-            await showPosts();
-            //usersPanel.scrollToElem(user.Id);
+            if (!user.isBlocked) {
+                await showPosts();
+                usersPanel.scrollToElem(user.Id);
+            }
+            else {
+                Users_API.logout();
+                showError(`${user.Name}, votre compte est bloqué.`);
+            }
         }
     });
     $('#cancel').on("click", async function () {
