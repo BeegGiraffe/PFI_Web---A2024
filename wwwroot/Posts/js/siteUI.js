@@ -269,9 +269,7 @@ function renderPost(post, loggedUser) {
         }
         else if (user.isAdmin) {
             crudIcon =  `
-            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
             <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
-            <span class="lCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
             `;
         }
     }
@@ -285,7 +283,13 @@ function renderPost(post, loggedUser) {
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
-            <div class="postDate"> ${date} </div>
+            <div class="postOwnerAndDate">
+                <div class="ownerLayout">
+                    <div class="avatar" style="background-image:url('${post.OwnerAvatar}')"></div>
+                    ${post.OwnerName}
+                </div>
+                <div class="postDate"> ${date} </div>
+            </div>
             <div postId="${post.Id}" class="postTextContainer hideExtra">
                 <div class="postText" >${post.Text}</div>
             </div>
