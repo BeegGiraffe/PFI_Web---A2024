@@ -24,12 +24,6 @@ async function Init_UI() {
     $('#createPost').on("click", async function () {
         showCreatePostForm();
     });
-    $('#createUser').on("click", async function () {
-        showCreateUserForm();
-    });
-    $('#login').on("click", async function () {
-        showLoginForm();
-    });
     $('#abort').on("click", async function () {
         showPosts();
     });
@@ -321,11 +315,19 @@ function updateDropDownMenu() {
                 ${user.Name}
             </div>`));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
+
+        if(user.isAdmin) {
+            DDMenu.append($(`
+                <div class="dropdown-item menuItemLayout" id="adminUser">
+                    <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
+                </div>`));
+            DDMenu.append($(`<div class="dropdown-divider"></div> `));
+        }
     }
-    if(user.isAdmin) {
+    else {
         DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="adminUser">
-                <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
+            <div class="dropdown-item menuItemLayout" id="connectUser">
+                <i class="cmdIcon fa fa-right-to-bracket" title="Connexion"></i>‎ Connexion
             </div>`));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
     }
@@ -356,6 +358,9 @@ function updateDropDownMenu() {
         selectedCategory = "";
         await showPosts(true);
         updateDropDownMenu();
+    });
+    $('#connectUser').on("click", async function () {
+        showLoginForm();
     });
     $('#editUser').on("click", async function () {
         showEditUserForm();
@@ -726,7 +731,7 @@ function renderUserForm(user = null) {
                 <input type="checkbox" name="keepDate" id="keepDate" class="checkbox" checked>
                 <label for="keepDate"> Conserver la date de création </label>
             </div>
-            <input type="submit" value="Enregistrer" id="saveUser" class="btn btn-primary displayNone">
+            <input type="submit" value="Enregistrer" id="saveUser" class="btn btn-primary">
         </form>
     `);
     if (create) $("#keepDateControl").hide();
@@ -734,10 +739,6 @@ function renderUserForm(user = null) {
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
 
-    $("#commit").click(function () {
-        $("#commit").off();
-        return $('#saveUser').trigger("click");
-    });
     $('#userForm').on("submit", async function (event) {
         event.preventDefault();
         let user = getFormData($("#userForm"));
@@ -746,7 +747,7 @@ function renderUserForm(user = null) {
         delete user.keepDate;
         user = await Users_API.Save(user, create);
         if (!Users_API.error) {
-            showLoginForm();
+            create ? showLoginForm() : await showPosts();
         }
         else
             showError("Une erreur est survenue! ", Users_API.currentHttpError);

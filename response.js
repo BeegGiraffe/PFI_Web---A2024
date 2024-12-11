@@ -78,7 +78,7 @@ export default class Response {
     deleted() { return this.status(202); }  // accepted status
     created(obj) {                      // created status
         if (obj.Authorizations)
-            this.res.writeHead(201, { 'content-type': 'application/json', 'Authorization' : obj.Authorizations});
+            this.res.writeHead(201, { 'content-type': 'application/json'});
         else 
             this.res.writeHead(201, { 'content-type': 'application/json', 'Authorization' : obj.Access_token });
         return this.end(JSON.stringify(obj));
