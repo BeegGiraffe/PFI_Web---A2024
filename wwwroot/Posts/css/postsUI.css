@@ -37,10 +37,19 @@
     padding-right: 8px;
 }
 
+.avatar {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    border-radius: 90px;
+}
+
 .postHeader {
     color: blue;
     display: grid;
-    grid-template-columns: auto 30px 30px;
+    grid-template-columns: auto 30px 30px 30px;
     align-items: center;
     height: 34px;
     text-transform: uppercase;

@@ -22,6 +22,7 @@ export default class User extends Model {
         instance.isBlocked = instance.Authorizations.readAccess == -1;
         instance.isSuper = instance.Authorizations.readAccess == 2 && instance.Authorizations.writeAccess == 2;
         instance.isAdmin = instance.Authorizations.readAccess == 3 && instance.Authorizations.writeAccess == 3;
+        instance.isUser = instance.Authorizations.readAccess == 1 && instance.Authorizations.writeAccess == 1;
         return instance;
     }
 }

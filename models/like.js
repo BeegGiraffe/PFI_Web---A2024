@@ -4,12 +4,23 @@ export default class Like extends Model {
     constructor() {
         super(true /* secured Id */);
 
-        this.addField('Title', 'string');
-        this.addField('Text', 'string');
-        this.addField('Category', 'string');
-        this.addField('Image', 'asset');
-        this.addField('Date', 'integer');
+        this.addField('PostId', 'string');
+        this.addField('UserId', 'string');
+        
 
-        this.setKey("Title");
+        this.setKey("Id");
+    }
+
+    bindExtraData(instance) {
+        instance = super.bindExtraData(instance);
+        let usersRepository = new Repository(new UserModel());
+        let ownerUser = usersRepository.get(instance.UserId);
+        if (ownerUser) {
+            instance.ownerName = ownerUser.Name;
+        }
+        else {
+            instance.ownerName = 'unknown';
+        }
+        return instance;
     }
 }

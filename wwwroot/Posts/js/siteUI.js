@@ -247,11 +247,32 @@ async function renderPosts(queryString) {
 }
 function renderPost(post, loggedUser) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
-    let crudIcon =
-        `
-        <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
-        <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
-        `;
+    let user = Users_API.getLoginUser();
+    let crudIcon = ``;
+    if (user) {
+        if (user.isSuper) {
+            crudIcon =  `
+            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
+            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            <span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
+            `;
+        }
+        else if (user.isUser) {
+            crudIcon =  `
+            <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
+            <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
+            <span class="likeCmd cmdIconSmall" postId="${post.Id}" title="Liker"></span>
+            `;
+        }
+        else if (user.isAdmin) {
+            crudIcon =  `
+            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
+            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            <span class="lCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
+            `;
+        }
+    }
+       
 
     return $(`
         <div class="post" id="${post.Id}">
@@ -291,23 +312,20 @@ async function compileCategories() {
 function updateDropDownMenu() {
     let DDMenu = $("#DDMenu");
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
+    let user = Users_API.getLoginUser();
     DDMenu.empty();
-    if(true) //ajouter condition admin
-    {
+    if (user) {
         DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="adminUser">
-                <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
+            <div class="dropdown-item menuItemLayout" id="editUser">
+                <div class="avatar" style="background-image:url('${user.Avatar}')"></div>
+                ${user.Name}
             </div>`));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
     }
-    if(true) //ajouter condition user connected
-    {
+    if(user.isAdmin) {
         DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="editUser">
-                <i class="cmdIcon fa fa-user-pen" title="Éditer Profile"></i>‎ Éditer Profile
-            </div>
-            <div class="dropdown-item menuItemLayout" id="deleteUser">
-                <i class="cmdIcon fa fa-user-xmark" title="Supprimer utilisateur"></i>‎ Supprimer utilisateur
+            <div class="dropdown-item menuItemLayout" id="adminUser">
+                <i class="cmdIcon fa fa-user-shield" title="Gestionnaire d'utilisateur"></i>‎ Gestionnaire d'utilisateur
             </div>`));
         DDMenu.append($(`<div class="dropdown-divider"></div> `));
     }
@@ -577,6 +595,7 @@ function renderPostForm(post = null) {
         <form class="form" id="postForm">
             <input type="hidden" name="Id" value="${post.Id}"/>
              <input type="hidden" name="Date" value="${post.Date}"/>
+            <input type="hidden" name="OwnerId" value="${post.OwnerId}"/>
             <label for="Category" class="form-label">Catégorie </label>
             <input 
                 class="form-control"
@@ -638,6 +657,7 @@ function renderPostForm(post = null) {
             selectedCategory = "";
         if (create || !('keepDate' in post))
             post.Date = Local_to_UTC(Date.now());
+            post.OwnerId = Users_API.getLoginUser().Id;
         delete post.keepDate;
         post = await Posts_API.Save(post, create);
         if (!Posts_API.error) {
@@ -726,8 +746,7 @@ function renderUserForm(user = null) {
         delete user.keepDate;
         user = await Users_API.Save(user, create);
         if (!Users_API.error) {
-            await showPosts();
-            usersPanel.scrollToElem(user.Id);
+            showLoginForm();
         }
         else
             showError("Une erreur est survenue! ", Users_API.currentHttpError);
@@ -766,7 +785,9 @@ function renderLoginForm(user = null) {
                 InvalidMessage="Le mot de passe comporte un caractère illégal"
                 value="${user.Password}"
             />
-            <input type="submit" value="Enregistrer" id="saveLogin" class="btn btn-primary displayNone">
+            <input type="submit" value="Connecter" id="saveLogin" class="btn btn-primary">
+            <br>
+            <input type="submit" value="S'inscrire" id="register" class="btn btn-primary">
         </form>
     `);
     if (create) $("#keepDateControl").hide();
@@ -774,9 +795,8 @@ function renderLoginForm(user = null) {
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
 
-    $("#commit").click(function () {
-        $("#commit").off();
-        return $('#saveLogin').trigger("click");
+    $("#register").click(function () {
+        showCreateUserForm();
     });
     $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
