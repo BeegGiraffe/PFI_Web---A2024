@@ -411,6 +411,14 @@ function attach_Posts_UI_Events_Callback() {
     $(".deleteCmd").on("click", function () {
         showDeletePostForm($(this).attr("postId"));
     });
+    $(".likeCmd").off();
+    $(".likeCmd").on("click", function () {
+        let like = {};
+        like.Id = "";
+        like.PostId = $(this).attr("postId");
+        like.UserId = Users_API.getLoginUser().id;
+        Posts_API.addLike(like)
+    });
     $(".moreText").off();
     $(".moreText").click(function () {
         $(`.commentsPanel[postId=${$(this).attr("postId")}]`).show();

@@ -6,9 +6,5 @@ export default class PostlikesModelsController extends Controller {
     constructor(HttpContext) {
         super(HttpContext, new Repository(new LikeModel()));
     }
-
-    togglelike (incomingLike) {
-
-    }
 }
 
