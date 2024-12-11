@@ -103,8 +103,7 @@ class Users_API {
                     error: (xhr) => { Users_API.setHttpErrorState(xhr); resolve(null); }
                 });
             });
-        }
-        
+        }   
     }
     static async Delete(id) {
         return new Promise(resolve => {

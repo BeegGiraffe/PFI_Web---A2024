@@ -46,7 +46,7 @@ export default class PostModelsController extends Controller {
     }
 
     put(data) {
-        if (AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser())) {
+        if (AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.anonymous())) {
             if (this.HttpContext.path.id !== '') {
                 data = this.repository.update(this.HttpContext.path.id, data);
                 if (this.repository.model.state.isValid) {
