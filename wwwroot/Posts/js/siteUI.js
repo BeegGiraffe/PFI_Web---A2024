@@ -151,8 +151,8 @@ function showCreateUserForm() {
 }
 function showEditUserForm() {
     showForm();
-    $("#viewTitle").text("Ajout d'utilisateur");
-    renderEditUserForm();
+    $("#viewTitle").text("Modification de profil");
+    renderUserForm(Users_API.getLoginUser());
 }
 function showLoginForm() {
     showForm();
@@ -483,21 +483,7 @@ async function renderEditPostForm(id) {
     }
     removeWaitingGif();
 }
-async function renderEditUserForm(id) {
-    $('#commit').show();
-    addWaitingGif();
-    let response = await Users_API.Get(id)
-    if (!Users_API.error) {
-        let User = response.data;
-        if (User !== null)
-            renderPostForm(User);
-        else
-            showError("User introuvable!");
-    } else {
-        showError(Users_API.currentHttpError);
-    }
-    removeWaitingGif();
-}
+
 async function renderDeletePostForm(id) {
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {

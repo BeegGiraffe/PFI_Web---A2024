@@ -79,7 +79,7 @@ class Users_API {
         if (create) {
             return new Promise(resolve => {
                 $.ajax({
-                    url: this.API_URL() + "/register/" + data.Id,
+                    url: this.API_URL() + "/register",
                     type: "POST",
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -90,9 +90,10 @@ class Users_API {
         } else {
             return new Promise(resolve => {
                 $.ajax({
-                    url: this.API_URL() + "/modify/" + data.Id,
+                    url: this.API_URL() + "/modify",
                     type: "PUT",
                     contentType: 'application/json',
+                    headers: { 'authorization' : sessionStorage.getItem('token') },
                     data: JSON.stringify(data),
                     success: (data) => { resolve(data); },
                     error: (xhr) => { Users_API.setHttpErrorState(xhr); resolve(null); }
