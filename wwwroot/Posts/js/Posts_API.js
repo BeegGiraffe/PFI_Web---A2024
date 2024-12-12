@@ -3,7 +3,7 @@ class Posts_API {
     static Host_URL() { return "http://localhost:5000"; }
     static POSTS_API_URL() { return this.Host_URL() + "/api/posts" };
     static POSTS_API_URL() { return this.Host_URL() + "/api/posts" };
-    static POSTLike_API_URL() { return this.POSTS_API_URL() + "/api/postLikes" };
+    static LIKES_API_URL() { return this.Host_URL() + "/api/likes" };
 
 
     static initHttpState() {
@@ -85,10 +85,11 @@ class Posts_API {
         });
     }
     static async addLike(data) {
+        Posts_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: create ? this.POSTLike_API_URL() : this.POSTLike_API_URL() + "/" + data.Id,
-                type: create ? "POST" : "PUT",
+                url: this.LIKES_API_URL(),
+                type: "POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },

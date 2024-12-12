@@ -1,4 +1,6 @@
 import Model from './model.js';
+import UserModel from './user.js'
+import Repository from './repository.js';
 
 export default class Like extends Model {
     constructor() {
@@ -16,7 +18,7 @@ export default class Like extends Model {
         let usersRepository = new Repository(new UserModel());
         let ownerUser = usersRepository.get(instance.UserId);
         if (ownerUser) {
-            instance.ownerName = ownerUser.Name;
+            instance.OwnerName = ownerUser.Name;
         }
         else {
             instance.ownerName = 'unknown';

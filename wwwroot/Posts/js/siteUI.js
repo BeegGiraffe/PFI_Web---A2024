@@ -414,10 +414,10 @@ function attach_Posts_UI_Events_Callback() {
     $(".likeCmd").off();
     $(".likeCmd").on("click", function () {
         let like = {};
-        like.Id = "";
+        like.Id = 0;
         like.PostId = $(this).attr("postId");
-        like.UserId = Users_API.getLoginUser().id;
-        Posts_API.addLike(like)
+        like.UserId = Users_API.getLoginUser().Id;
+        Posts_API.addLike(like);
     });
     $(".moreText").off();
     $(".moreText").click(function () {
