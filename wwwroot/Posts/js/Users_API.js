@@ -107,7 +107,6 @@ class Users_API {
         return new Promise(resolve => {
             $.ajax({
                 url: this.API_URL() + "/remove/" + id,
-                type: "DELETE",
                 success: () => {
                     Users_API.initHttpState();
                     resolve(true);

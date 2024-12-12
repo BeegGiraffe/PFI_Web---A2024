@@ -147,7 +147,11 @@ function showError(message, details = "") {
     $("#errorContainer").append($(`<div>${message}</div>`));
     $("#errorContainer").append($(`<div>${details}</div>`));
 }
-
+function showAdminUserForm () {
+    showForm();
+    $("#viewTitle").text("Gestionnaire des usagers");
+    renderAdminUserForm();
+}
 function showCreatePostForm() {
     showForm();
     $("#viewTitle").text("Ajout de nouvelle");
@@ -162,6 +166,11 @@ function showEditUserForm() {
     showForm();
     $("#viewTitle").text("Modification de profil");
     renderUserForm(Users_API.getLoginUser());
+}
+function showRemoveConfirmationForm(id) {
+    showForm();
+    $("#viewTitle").text("Suppression d'utilisateur");
+    renderRemoveForm(id);
 }
 function showLoginForm() {
     showForm();
@@ -273,7 +282,6 @@ function renderPost(post, likes) {
         else
             names = `Liker`;    
     }
-    
 
     let crudIcon = ``;
     let LikeOption = `<span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="${names}"></span>`;
@@ -590,41 +598,39 @@ async function renderDeletePostForm(id) {
     } else
         showError(Posts_API.currentHttpError);
 }
-async function renderDeleteUserForm(id) {
-    let response = await Users_API.Get(id)
-    if (!Users_API.error) {
-        let user = response.data;
-        if (user !== null) {
-            let date = convertToFrenchDate(UTC_To_Local(user.Created));
-            $("#form").append(`
-                <div class="post" id="${user.Id}">
-                <div class="postHeader">  ${user.Name} </div>
-                <div class="postTitle ellipsis"> ${user.Email} </div>
-                <div class="postTitle ellipsis"> ${user.Authorizations} </div>
-                <img class="postImage" src='${user.Avatar}'/>
-                <div class="postDate"> ${date} </div>
-            `);
-            linefeeds_to_Html_br(".postText");
-            // attach form buttons click event callback
-            $('#commit').on("click", async function () {
-                await Users_API.Delete(user.Id);
-                if (!Users_API.error) {
-                    await showPosts();
-                }
-                else {
-                    console.log(Users_API.currentHttpError)
-                    showError("Une erreur est survenue!");
-                }
-            });
-            $('#cancel').on("click", async function () {
-                await showPosts();
-            });
+async function renderRemoveForm(id) {
+    if (id) {
+        $("#form").show();
+        $("#form").empty();
+        $("#form").append(`
+            <form class="form" id="removeForm">
+                <input type="hidden" name="Id" value="${id}">
+                <input type="submit" value="Effacer mon compte" id="deleteUser" class="btn btn-primary">
+                <input type="button" value="Annuler" id="goBack" class="btn btn-primary">
+            </form>
+        `);
 
-        } else {
-            showError("User introuvable!");
-        }
-    } else
-        showError(Users_API.currentHttpError);
+        $("#goBack").click(function () {
+            showEditUserForm();
+        });
+        // attach form buttons click event callback
+        $('#removeForm').on("submit", async function (event) {
+            event.preventDefault();
+            let result = getFormData($("#removeForm"));
+            user = await Users_API.Delete(result.Id);
+            if (!Users_API.error) {
+                await showPosts();
+            }
+            else
+                showError("Une erreur est survenue! ", Users_API.currentHttpError);
+        });
+        $('#cancel').on("click", async function () {
+            await showPosts();
+        });
+
+    } else {
+        showError("User introuvable!");
+    }
 }
 function newPost() {
     let Post = {};
@@ -644,6 +650,12 @@ function newUser() {
     User.Avatar = "no-avatar.png";
     User.Authorizations = 0;
     return User;
+}
+function newConnection() {
+    let connection = {};
+    connection.Email = "";
+    connection.Password = "";
+    return connection;
 }
 function renderPostForm(post = null) {
     let create = post == null;
@@ -786,13 +798,20 @@ function renderUserForm(user = null) {
                 <label for="keepDate"> Conserver la date de création </label>
             </div>
             <input type="submit" value="Enregistrer" id="saveUser" class="btn btn-primary">
+            <input type="button" value="Effacer ce compte" userId="${user.Id}" id="removeUser" class="btn btn-primary">
         </form>
     `);
-    if (create) $("#keepDateControl").hide();
+    if (create) {
+        $("#keepDateControl").hide();
+        $("#removeUser").hide();
+    } 
 
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
 
+    $("#removeUser").click(function () {
+        showRemoveConfirmationForm($(this).attr("userId"));
+    });
     $('#userForm').on("submit", async function (event) {
         event.preventDefault();
         let user = getFormData($("#userForm"));
@@ -811,9 +830,8 @@ function renderUserForm(user = null) {
     });
 }
 
-function renderLoginForm(user = null) {
-    let create = user == null;
-    if (create) user = newUser();
+function renderLoginForm() {
+    let user = newConnection();
     $("#form").show();
     $("#form").empty();
     $("#form").append(`
@@ -842,10 +860,9 @@ function renderLoginForm(user = null) {
             />
             <input type="submit" value="Connecter" id="saveLogin" class="btn btn-primary">
             <br>
-            <input type="submit" value="S'inscrire" id="register" class="btn btn-primary">
+            <input type="button" value="S'inscrire" id="register" class="btn btn-primary">
         </form>
     `);
-    if (create) $("#keepDateControl").hide();
 
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
@@ -872,6 +889,54 @@ function renderLoginForm(user = null) {
         await showPosts();
     });
 }
+async function renderAdminUserForm() {
+    let users = await Users_API.Get();
+    users = users.data;
+    $("#form").show();
+    $("#form").empty();
+
+    users.forEach(user => {
+        $("#form").append(renderUser(user));
+    });
+
+    initImageUploaders();
+    initFormValidation(); // important do to after all html injection!
+    
+    $('#userType').on("click", async function (event) {
+        event.preventDefault();
+        let userId = $(this).attr("typeUserId");
+        
+        if (!Users_API.error) {
+            if (!user.isBlocked) {
+                await showPosts();
+            }
+            else {
+                Users_API.logout();
+                showError(`${user.Name}, votre compte est bloqué.`);
+            }
+        }
+    });
+}
+function renderUser(user) {
+    $("#form").append(`
+        <div class="userRow" user_id=${user.Id}">
+            <div class="userContainer noselect">
+                <div class="userLayout">
+                    <div class="userAvatarMedium" style="background-image:url('${user.Avatar}')"></div>
+                    <div class="userInfo">
+                        <span class="userName">${user.Name}</span>
+                    </div>
+                </div>
+                <div class="userCommandPanel">
+                    <span class="typeCmd cmdIcon fa-solid fa-user-plus" typeUserId="${user.Id}" id="userType" title="Changer ${user.Name}"></span>
+                    <span class="blockCmd cmdIcon fa-solid fa-lock" blockUserId="${user.Id}" id="userBlock" title="Bloquer ${user.Name}"></span>
+                    <span class="deleteCmd cmdIcon fa fa-trash" deleteUserId="${user.Id}" is="userDelete" title="Effacer ${user.Name}"></span>
+                </div>
+            </div>
+        </div>
+    `);
+}
+
 function getFormData($form) {
     // prevent html injections
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
