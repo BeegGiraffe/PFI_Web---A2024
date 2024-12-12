@@ -902,19 +902,29 @@ async function renderAdminUserForm() {
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
     
-    $('#userType').on("click", async function (event) {
-        event.preventDefault();
-        let userId = $(this).attr("typeUserId");
-        
-        if (!Users_API.error) {
-            if (!user.isBlocked) {
-                await showPosts();
-            }
-            else {
-                Users_API.logout();
-                showError(`${user.Name}, votre compte est bloqué.`);
-            }
-        }
+    $('.typeCmd').on('click', async function() {
+        let userId = $(this).attr('typeUserId');
+        let user = await Users_API.Get(userId);
+        user = user.data[0];
+        await Users_API.Promote(user);
+        showUsersAdmin();
+
+    });
+    $('.blockCmd').on('click', async function() {
+        let userId = $(this).attr('blockUserId');
+        let user = await Users_API.Get(userId);
+        user = user.data[0];
+        await Users_API.Block(user);
+        showUsersAdmin();
+
+    });
+    $('.unblockCmd').on('click', async function() {
+        let userId = $(this).attr('deleteUserId');
+        let user = await Users_API.Get(userId);
+        user = user.data[0];
+        await Users_API.Block(user);
+        showUsersAdmin();
+
     });
 }
 function renderUser(user) {
