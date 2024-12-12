@@ -66,8 +66,6 @@ class Users_API {
                 success: (data) => { 
                     sessionStorage.setItem("token", data.Access_token);
                     sessionStorage.setItem("user", JSON.stringify(data.User));
-                    console.log(sessionStorage.getItem('token'));
-                    console.log(sessionStorage.getItem('user'));
                     resolve(data); 
                 },
                 error: (xhr) => { Users_API.setHttpErrorState(xhr); resolve(null); }

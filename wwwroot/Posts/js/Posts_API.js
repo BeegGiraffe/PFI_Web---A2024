@@ -97,4 +97,29 @@ class Posts_API {
             });
         });
     }
+    static async GetLikes() {
+        Posts_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.LIKES_API_URL(),
+                complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
+                error: (xhr) => { Posts_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async DeleteLike (id) {
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.LIKES_API_URL() + "/" + id,
+                type: "DELETE",
+                success: () => {
+                    Posts_API.initHttpState();
+                    resolve(true);
+                }
+                /*error: (xhr) => {
+                    Posts_API.setHttpErrorState(xhr); resolve(null);
+                }*/
+            });
+        });
+    }
 }

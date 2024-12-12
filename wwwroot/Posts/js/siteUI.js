@@ -229,13 +229,14 @@ async function renderPosts(queryString) {
     }
     addWaitingGif();
     let response = await Posts_API.GetQuery(queryString);
+    let likes = await Posts_API.GetLikes();
     if (!Posts_API.error) {
         currentETag = response.ETag;
         currentPostsCount = parseInt(currentETag.split("-")[0]);
         let Posts = response.data;
         if (Posts.length > 0) {
             Posts.forEach(Post => {
-                postsPanel.append(renderPost(Post));
+                postsPanel.append(renderPost(Post, likes.data));
             });
         } else
             endOfData = true;
@@ -248,27 +249,55 @@ async function renderPosts(queryString) {
     removeWaitingGif();
     return endOfData;
 }
-function renderPost(post, loggedUser) {
+function renderPost(post, likes) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
     let user = Users_API.getLoginUser();
+    let names = ``;
+    let isUserConnected = false;
+    let likeId = "";
+    if (user) {
+        if (likes.length > 0) {
+            likes.forEach(like => {
+                if (like.PostId == post.Id) {
+                    names += `${like.UserName} \n`;
+                }
+                
+                if (like.UserId == user.Id && like.PostId == post.Id) {
+                    isUserConnected = true;
+                    likeId = like.Id;
+                }
+            });
+            if (names == ``)
+                names = `Liker`;
+        }
+        else
+            names = `Liker`;    
+    }
+    
+
     let crudIcon = ``;
+    let LikeOption = `<span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="${names}"></span>`;
+    let DislikeOption = `<span class="dislikeCmd cmdIconSmall fa-solid fa-heart" likeId="${likeId}" postId="${post.Id}" title="${names}"></span>`;
+
     if (user) {
         if (user.isSuper) {
             crudIcon =  `
             <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
             <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
-            <span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
+             ${ isUserConnected ? DislikeOption : LikeOption }
             `;
         }
         else if (user.isUser) {
             crudIcon =  `
             <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
             <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
-            <span class="likeCmd cmdIconSmall fa-regular fa-heart" postId="${post.Id}" title="Liker"></span>
+             ${ isUserConnected ? DislikeOption : LikeOption}
             `;
         }
         else if (user.isAdmin) {
             crudIcon =  `
+            <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
+            <span class="cmdIconSmall" postId="${post.Id}" title=""></span>
             <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
             `;
         }
@@ -300,6 +329,7 @@ function renderPost(post, loggedUser) {
         </div>
     `);
 }
+
 async function compileCategories() {
     categories = [];
     let response = await Posts_API.GetQuery("?fields=category&sort=category");
@@ -412,12 +442,20 @@ function attach_Posts_UI_Events_Callback() {
         showDeletePostForm($(this).attr("postId"));
     });
     $(".likeCmd").off();
-    $(".likeCmd").on("click", function () {
+    $(".likeCmd").on("click", async function () {
         let like = {};
         like.Id = 0;
         like.PostId = $(this).attr("postId");
         like.UserId = Users_API.getLoginUser().Id;
         Posts_API.addLike(like);
+        //postsPanel.scrollToElem($(this).attr("postId"));
+        await showPosts();
+    });
+    $(".dislikeCmd").off();
+    $(".dislikeCmd").on("click", async function () {
+        Posts_API.DeleteLike($(this).attr("likeId"));
+        //postsPanel.scrollToElem($(this).attr("postId"));
+        await showPosts();
     });
     $(".moreText").off();
     $(".moreText").click(function () {
@@ -823,7 +861,6 @@ function renderLoginForm(user = null) {
         if (!Users_API.error) {
             if (!user.isBlocked) {
                 await showPosts();
-                usersPanel.scrollToElem(user.Id);
             }
             else {
                 Users_API.logout();

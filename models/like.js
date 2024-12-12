@@ -18,10 +18,10 @@ export default class Like extends Model {
         let usersRepository = new Repository(new UserModel());
         let ownerUser = usersRepository.get(instance.UserId);
         if (ownerUser) {
-            instance.OwnerName = ownerUser.Name;
+            instance.UserName = ownerUser.Name;
         }
         else {
-            instance.ownerName = 'unknown';
+            instance.UserName = 'unknown';
         }
         return instance;
     }
